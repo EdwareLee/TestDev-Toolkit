@@ -1,0 +1,7 @@
+2026-02-10 10:00:01 INFO module:auth msg:user logged in
+2026-02-10 10:01:22 ERROR module:user_login msg:auth failed
+2026-02-10 10:02:15 WARNING module:cache msg:timeout
+2026-02-10 10:03:44 ERROR module:payment msg:invalid token
+2026-02-10 10:04:10 ERROR module:user_login msg:account locked
+2026-02-10 10:05:00 DEBUG module:db msg:query executed
+2026-02-10 10:06:00 ERROR module:network msg:timeout
