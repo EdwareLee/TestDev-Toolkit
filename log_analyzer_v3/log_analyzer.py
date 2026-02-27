@@ -27,38 +27,41 @@ def is_valid_brackets(s: str) -> bool:
     return not stack
 
 
-def parse_log_line(line: str):
-    """
-    解析单行日志。
-    成功返回 dict，失败返回 None。
-    """
-    try:
-        parts = line.strip().split()
-        if len(parts) < 6:
-            return None
-        
-        level = parts[2]
-        if level not in ("ERROR", "WARNING"):
-            return None
-        
-        fields = {}
-        for part in parts[3:]:
-            if ':' in part:
-                key, value = part.split(':', 1)
-                fields[key] = value
-        
-        if 'module' not in fields or 'code' not in fields:
-            return None
-        
-        return {
-            "level": level,
-            "module": fields["module"],
-            "ip": fields.get("ip", "unknown"),
-            "code": fields["code"],
-            "msg": fields.get("msg", "")
-        }
-    except Exception:
+def read_one_log_line(line):
+    """从一行日志中提取信息"""
+    # 按空格切分成单词
+    words = line.strip().split()
+    
+    # 如果单词太少，跳过
+    if len(words) < 6:
         return None
+    
+    # 第3个单词是日志级别（ERROR / WARNING）
+    log_level = words[2]
+    if log_level != "ERROR" and log_level != "WARNING":
+        return None
+    
+    # 先设默认值
+    module = "unknown"
+    code = "unknown"
+    msg = ""
+    
+    # 从第4个单词开始找 key:value
+    for word in words[3:]:
+        if word.startswith("module:"):
+            module = word[7:]      # 去掉 "module:"
+        elif word.startswith("code:"):
+            code = word[5:]        # 去掉 "code:"
+        elif word.startswith("msg:"):
+            msg = word[4:]         # 去掉 "msg:"
+    
+    # 返回整理好的信息
+    return {
+        "level": log_level,
+        "module": module,
+        "code": code,
+        "msg": msg
+    }
 
 
 def analyze_log_file(file_path: str, target_level: str = "ERROR", check_json: bool = False):
