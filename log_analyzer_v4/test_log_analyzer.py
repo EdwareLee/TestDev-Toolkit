@@ -47,3 +47,19 @@ def test_parse_garbage_or_empty_line():
     # 情况3：只有日期
     assert parse_log_line("2026-02-10")["level"] == "INFO"  # 默认 INFO
 
+const sulution(nums) => {
+    let slow = 0,
+    let fast = 1,
+    if (length(nums) == 0) {
+        return 0
+    }
+    
+    for (let fast = 0; fast < nums.length; fast++) {
+        if (nums[slow] != nums[fast]) {
+            slow++;
+            nums[slow] = nums[fast]
+        }
+    }
+    
+    return slow++
+}
