@@ -1,0 +1,5 @@
+2025-02-25 10:00:01 ERROR module:auth ip:192.168.1.10 code:E1001 msg:{"user":"alice"}
+2025-02-25 10:00:02 WARNING module:cache ip:10.0.0.5 code:W2003 msg:Cache miss
+2025-02-25 10:00:03 ERROR module:payment ip:192.168.1.11 code:E2005 msg:{"amount":100
+2025-02-25 10:00:04 ERROR module:auth ip:192.168.1.12 code:E1001 msg:{"user":"bob"}
+2025-02-25 10:00:05 INFO module:health ip:127.0.0.1 code:I0001 msg:OK

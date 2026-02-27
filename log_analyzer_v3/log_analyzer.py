@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 日志分析工具 v3
 功能：
@@ -7,52 +10,43 @@
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 
-"""Leetcode check json"""
-def is_valid_brackets(s:str) -> bool:
+
+def is_valid_brackets(s: str) -> bool:
     """判断字符串中的括号是否有效（仅处理 ()[]{}）"""
     stack = []
-    mapping = {
-        ")": "(",
-        "]":"[",
-        "}":"{"
-    }
+    mapping = {")": "(", "]": "[", "}": "{"}
     for char in s:
-        if char == "({[":
+        if char in "([{":
             stack.append(char)
         elif char in mapping:
             if not stack or stack.pop() != mapping[char]:
                 return False
-        return not stack
+    return not stack
 
-"""日志解析器"""
+
 def parse_log_line(line: str):
     """
     解析单行日志。
     成功返回 dict，失败返回 None。
-    
-    支持格式示例:
-    2025-02-25 10:00:01 ERROR module:auth ip:192.168.1.10 code:E1001 msg:Invalid token
     """
     try:
         parts = line.strip().split()
         if len(parts) < 6:
             return None
         
-        # 提取日志级别（第3个字段）
         level = parts[2]
         if level not in ("ERROR", "WARNING"):
             return None
         
-        # 解析 key:value 字段（从第4个字段开始）
         fields = {}
         for part in parts[3:]:
             if ':' in part:
-                key, value = part.split(':', 1)  # 只分割第一个冒号
+                key, value = part.split(':', 1)
                 fields[key] = value
         
-        # 必须包含 module 和 code
         if 'module' not in fields or 'code' not in fields:
             return None
         
@@ -64,17 +58,15 @@ def parse_log_line(line: str):
             "msg": fields.get("msg", "")
         }
     except Exception:
-        return None  # 任何解析错误都跳过该行
-    
+        return None
+
+
 def analyze_log_file(file_path: str, target_level: str = "ERROR", check_json: bool = False):
-    """
-    分析日志文件，返回按模块聚合的统计结果。
-    """
     stats = defaultdict(lambda: {
         "count": 0,
         "ips": set(),
         "codes": set(),
-        "invalid_json_lines": []  # 如果启用 check_json
+        "invalid_json_lines": []
     })
     
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -91,12 +83,10 @@ def analyze_log_file(file_path: str, target_level: str = "ERROR", check_json: bo
             stats[mod]["ips"].add(data["ip"])
             stats[mod]["codes"].add(data["code"])
             
-            # JSON 校验
             if check_json:
                 if not is_valid_brackets(data["msg"]):
                     stats[mod]["invalid_json_lines"].append(line_num)
     
-    # 转换为普通字典 + list（JSON 序列化需要）
     result = {}
     for mod, info in stats.items():
         result[mod] = {
@@ -108,8 +98,7 @@ def analyze_log_file(file_path: str, target_level: str = "ERROR", check_json: bo
             result[mod]["invalid_json_lines"] = info["invalid_json_lines"]
     
     return result
-     
-     
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -132,7 +121,7 @@ def main():
         default="ERROR",
         help="要分析的日志级别 (默认: ERROR)"
     )
-    parser.addargin(
+    parser.add_argument(
         "--check-json",
         action="store_true",
         help="校验日志中 msg 字段的 JSON 括号是否合法"
